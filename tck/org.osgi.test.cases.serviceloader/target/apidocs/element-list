@@ -1,0 +1,7 @@
+org.osgi.test.cases.serviceloader.client
+org.osgi.test.cases.serviceloader.export
+org.osgi.test.cases.serviceloader.impl
+org.osgi.test.cases.serviceloader.impl1
+org.osgi.test.cases.serviceloader.junit
+org.osgi.test.cases.serviceloader.serviceclient
+org.osgi.test.cases.serviceloader.spi

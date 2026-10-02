@@ -1,0 +1,5 @@
+org.osgi.test.cases.serviceloader.secure.client
+org.osgi.test.cases.serviceloader.secure.export
+org.osgi.test.cases.serviceloader.secure.impl
+org.osgi.test.cases.serviceloader.secure.junit
+org.osgi.test.cases.serviceloader.secure.spi

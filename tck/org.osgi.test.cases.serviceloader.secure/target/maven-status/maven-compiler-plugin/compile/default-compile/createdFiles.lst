@@ -1,0 +1,6 @@
+org/osgi/test/cases/serviceloader/secure/export/TestBridge.class
+org/osgi/test/cases/serviceloader/secure/spi/ColorProvider.class
+org/osgi/test/cases/serviceloader/secure/junit/ServiceLoaderSecureTest.class
+org/osgi/test/cases/serviceloader/secure/impl/ColorProviderImpl.class
+org/osgi/test/cases/serviceloader/secure/client/ColorProviderClient.class
+org/osgi/test/cases/serviceloader/secure/client/ColorProviderClientOSGi.class

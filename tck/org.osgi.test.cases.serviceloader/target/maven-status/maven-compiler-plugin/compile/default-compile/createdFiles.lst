@@ -1,0 +1,16 @@
+org/osgi/test/cases/serviceloader/impl/ColorProviderImpl2.class
+org/osgi/test/cases/serviceloader/impl/ShapeProviderImpl2.class
+org/osgi/test/cases/serviceloader/impl/ColorProviderImpl.class
+org/osgi/test/cases/serviceloader/spi/ColorProvider.class
+org/osgi/test/cases/serviceloader/client/ColorProviderClientOSGi.class
+org/osgi/test/cases/serviceloader/export/TestBridge.class
+org/osgi/test/cases/serviceloader/impl1/Activator.class
+org/osgi/test/cases/serviceloader/client/ColorProviderClient2.class
+org/osgi/test/cases/serviceloader/client/ColorProviderClient.class
+org/osgi/test/cases/serviceloader/junit/ServiceLoaderServiceClientTest$1.class
+org/osgi/test/cases/serviceloader/junit/ServiceLoaderTest.class
+org/osgi/test/cases/serviceloader/client/LegacyClient.class
+org/osgi/test/cases/serviceloader/serviceclient/ColorProviderClient.class
+org/osgi/test/cases/serviceloader/junit/ServiceLoaderServiceClientTest.class
+org/osgi/test/cases/serviceloader/impl/ShapeProviderImpl.class
+org/osgi/test/cases/serviceloader/spi/ShapeProvider.class

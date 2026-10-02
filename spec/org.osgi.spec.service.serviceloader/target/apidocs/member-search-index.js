@@ -1,0 +1,1 @@
+memberSearchIndex = [{"p":"org.osgi.service.serviceloader","c":"ServiceLoaderNamespace","l":"CAPABILITY_REGISTER_DIRECTIVE"},{"p":"org.osgi.service.serviceloader","c":"ServiceLoaderNamespace","l":"SERVICELOADER_NAMESPACE"}];updateSearchResults();

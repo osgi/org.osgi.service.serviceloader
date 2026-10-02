@@ -1,0 +1,94 @@
+<?xml version='1.0' encoding='utf-8'?>
+<top>
+  <package name='org.osgi.service.serviceloader' fqn='org.osgi.service.serviceloader' qn='org.osgi.service.serviceloader'>
+<org.osgi.annotation.versioning.Version><value>1.0</value>
+</org.osgi.annotation.versioning.Version>
+   <lead>
+Service Loader Mediator Package Version 1.0.
+   </lead>
+   <description>
+Service Loader Mediator Package Version 1.0.
+ 
+ <p>
+ Bundles wishing to use this package must list the package in the
+ Import-Package header of the bundle's manifest. This package has two types of
+ users: the consumers that use the API in this package and the providers that
+ implement the API in this package.
+ 
+ </p><p>
+ Example import for consumers using the API in this package:
+ </p><p>
+ {@code  Import-Package: org.osgi.service.serviceloader; version="[1.0,2.0)"}
+ </p><p>
+ Example import for providers implementing the API in this package:
+ </p><p>
+ {@code  Import-Package: org.osgi.service.serviceloader; version="[1.0,1.1)"}</p>
+   </description>
+<author>@author $Id: 46c74fc19846ad1a05c874ed494a511392cfadf8 $</author>
+  <class name='ServiceLoaderNamespace' fqn='org.osgi.service.serviceloader.ServiceLoaderNamespace' qn='ServiceLoaderNamespace' package='org.osgi.service.serviceloader' typeParam='' modifiers='public final class' superclass='Namespace' kind='CLASS'>
+   <lead>
+Service Loader Capability and Requirement Namespace.
+   </lead>
+   <description>
+Service Loader Capability and Requirement Namespace.
+ 
+ <p>
+ This class defines the names for the attributes and directives for this
+ namespace.
+ 
+ </p><p>
+ All unspecified capability attributes are of one of the following types:
+ </p><ul>
+ <li>{@code String}</li>
+ <li>{@code Version}</li>
+ <li>{@code Long}</li>
+ <li>{@code Double}</li>
+ <li>{@code List&lt;String&gt;}</li>
+ <li>{@code List&lt;Version&gt;}</li>
+ <li>{@code List&lt;Long&gt;}</li>
+ <li>{@code List&lt;Double&gt;}</li>
+ </ul>
+ and are used as arbitrary matching attributes for the capability. The values
+ associated with the specified directive and attribute keys are of type
+ {@code String}, unless otherwise indicated.
+ 
+ <p>
+ All unspecified capability attributes, unless the attribute name starts with
+ full stop ({@code &apos;.&apos;} &#92;u002E), are also used as service properties when
+ registering a Service Provider as a service.</p>
+   </description>
+<Immutable></Immutable><author>@author $Id: 8666788fdd1f91e17cb6e83a2d3365cedb46f49e $</author>
+    <field name='SERVICELOADER_NAMESPACE' fqn='org.osgi.service.serviceloader.ServiceLoaderNamespace.SERVICELOADER_NAMESPACE' qn='ServiceLoaderNamespace.SERVICELOADER_NAMESPACE' package='org.osgi.service.serviceloader' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"osgi.serviceloader"'>
+   <lead>
+Namespace name for service loader capabilities and requirements.
+   </lead>
+   <description>
+Namespace name for service loader capabilities and requirements.
+ 
+ <p>
+ Also, the capability attribute used to specify the fully qualified name
+ of the service type.</p>
+   </description>
+
+     </field>
+    <field name='CAPABILITY_REGISTER_DIRECTIVE' fqn='org.osgi.service.serviceloader.ServiceLoaderNamespace.CAPABILITY_REGISTER_DIRECTIVE' qn='ServiceLoaderNamespace.CAPABILITY_REGISTER_DIRECTIVE' package='org.osgi.service.serviceloader' modifiers='public static final' typeName='String' qualifiedTypeName='java.lang.String' dimension='' constantValue='"register"'>
+   <lead>
+The capability directive used to specify the implementation class of the
+ service.
+   </lead>
+   <description>
+The capability directive used to specify the implementation class of the
+ service. The value of this directive must be of type {@code String}.
+ <p>
+ If this directive is not specified, then all advertised Service Providers
+ that match the service type name must be registered. If this directive is
+ specified, then only Service Providers that match the service type name
+ whose implementation class matches the value of this attribute must be
+ registered. To not register a service for this capability use an empty
+ string.</p>
+   </description>
+
+     </field>
+  </class>
+  </package>
+</top>

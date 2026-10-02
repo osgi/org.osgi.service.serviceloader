@@ -1,0 +1,15 @@
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.serviceloader/tck/org.osgi.test.cases.serviceloader/src/main/java/org/osgi/test/cases/serviceloader/client/ColorProviderClient.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.serviceloader/tck/org.osgi.test.cases.serviceloader/src/main/java/org/osgi/test/cases/serviceloader/client/ColorProviderClient2.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.serviceloader/tck/org.osgi.test.cases.serviceloader/src/main/java/org/osgi/test/cases/serviceloader/client/ColorProviderClientOSGi.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.serviceloader/tck/org.osgi.test.cases.serviceloader/src/main/java/org/osgi/test/cases/serviceloader/client/LegacyClient.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.serviceloader/tck/org.osgi.test.cases.serviceloader/src/main/java/org/osgi/test/cases/serviceloader/export/TestBridge.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.serviceloader/tck/org.osgi.test.cases.serviceloader/src/main/java/org/osgi/test/cases/serviceloader/impl/ColorProviderImpl.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.serviceloader/tck/org.osgi.test.cases.serviceloader/src/main/java/org/osgi/test/cases/serviceloader/impl/ColorProviderImpl2.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.serviceloader/tck/org.osgi.test.cases.serviceloader/src/main/java/org/osgi/test/cases/serviceloader/impl/ShapeProviderImpl.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.serviceloader/tck/org.osgi.test.cases.serviceloader/src/main/java/org/osgi/test/cases/serviceloader/impl/ShapeProviderImpl2.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.serviceloader/tck/org.osgi.test.cases.serviceloader/src/main/java/org/osgi/test/cases/serviceloader/impl1/Activator.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.serviceloader/tck/org.osgi.test.cases.serviceloader/src/main/java/org/osgi/test/cases/serviceloader/junit/ServiceLoaderServiceClientTest.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.serviceloader/tck/org.osgi.test.cases.serviceloader/src/main/java/org/osgi/test/cases/serviceloader/junit/ServiceLoaderTest.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.serviceloader/tck/org.osgi.test.cases.serviceloader/src/main/java/org/osgi/test/cases/serviceloader/serviceclient/ColorProviderClient.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.serviceloader/tck/org.osgi.test.cases.serviceloader/src/main/java/org/osgi/test/cases/serviceloader/spi/ColorProvider.java
+/home/stbischof/git/OSGI_MIGRATE/osgi_target/org.osgi.service.serviceloader/tck/org.osgi.test.cases.serviceloader/src/main/java/org/osgi/test/cases/serviceloader/spi/ShapeProvider.java

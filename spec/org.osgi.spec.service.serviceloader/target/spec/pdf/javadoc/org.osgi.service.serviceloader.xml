@@ -1,0 +1,131 @@
+<section xmlns="http://docbook.org/ns/docbook"
+         xreflabel="org.osgi.service.serviceloader"
+         version="5"
+         role="package"
+         xml:id="org.osgi.service.serviceloader">
+   <title>org.osgi.service.serviceloader</title>
+   <info>
+      <releaseinfo xml:id="org.osgi.service.serviceloader-version">Version 1.0</releaseinfo>
+      <edition xml:id="org.osgi.service.serviceloader-version.number">1.0</edition>
+   </info>
+   <para>
+Service Loader Mediator Package Version 1.0.
+ 
+ </para>
+   <para>
+ Bundles wishing to use this package must list the package in the
+ Import-Package header of the bundle's manifest. This package has two types of
+ users: the consumers that use the API in this package and the providers that
+ implement the API in this package.
+ 
+ </para>
+   <para>
+ Example import for consumers using the API in this package:
+ </para>
+   <para>
+ {@code  Import-Package: org.osgi.service.serviceloader; version="[1.0,2.0)"}
+ </para>
+   <para>
+ Example import for providers implementing the API in this package:
+ </para>
+   <para>
+ {@code  Import-Package: org.osgi.service.serviceloader; version="[1.0,1.1)"}</para>
+   <section role="summary">
+      <title>Summary</title>
+      <itemizedlist>
+         <listitem>
+            <para>
+               <link linkend="org.osgi.service.serviceloader.ServiceLoaderNamespace">
+                  <code>ServiceLoaderNamespace</code>
+               </link> - 
+Service Loader Capability and Requirement Namespace.
+   </para>
+         </listitem>
+      </itemizedlist>
+   </section>
+   <section xreflabel="ServiceLoaderNamespace"
+            role="class"
+            xml:id="org.osgi.service.serviceloader.ServiceLoaderNamespace">
+      <title>public final class ServiceLoaderNamespace<?line-break?> extends Namespace</title>
+      <para>
+Service Loader Capability and Requirement Namespace.
+ 
+ </para>
+      <para>
+ This class defines the names for the attributes and directives for this
+ namespace.
+ 
+ </para>
+      <para>
+ All unspecified capability attributes are of one of the following types:
+ </para>
+      <itemizedlist>
+         <listitem>
+            <para>{@code String}</para>
+         </listitem>
+         <listitem>
+            <para>{@code Version}</para>
+         </listitem>
+         <listitem>
+            <para>{@code Long}</para>
+         </listitem>
+         <listitem>
+            <para>{@code Double}</para>
+         </listitem>
+         <listitem>
+            <para>{@code List&lt;String&gt;}</para>
+         </listitem>
+         <listitem>
+            <para>{@code List&lt;Version&gt;}</para>
+         </listitem>
+         <listitem>
+            <para>{@code List&lt;Long&gt;}</para>
+         </listitem>
+         <listitem>
+            <para>{@code List&lt;Double&gt;}</para>
+         </listitem>
+      </itemizedlist>
+      <para>
+ and are used as arbitrary matching attributes for the capability. The values
+ associated with the specified directive and attribute keys are of type
+ {@code String}, unless otherwise indicated.
+ 
+ </para>
+      <para>
+ All unspecified capability attributes, unless the attribute name starts with
+ full stop ({@code '.'} \u002E), are also used as service properties when
+ registering a Service Provider as a service.</para>
+      <formalpara role="parameter">
+         <title>Concurrency</title>
+         <para>Immutable </para>
+      </formalpara>
+      <section xreflabel="CAPABILITY_REGISTER_DIRECTIVE"
+               role="field"
+               xml:id="org.osgi.service.serviceloader.ServiceLoaderNamespace.CAPABILITY_REGISTER_DIRECTIVE">
+         <title>public static final String CAPABILITY_REGISTER_DIRECTIVE = "register"</title>
+         <para>
+The capability directive used to specify the implementation class of the
+ service. The value of this directive must be of type {@code String}.
+ </para>
+         <para>
+ If this directive is not specified, then all advertised Service Providers
+ that match the service type name must be registered. If this directive is
+ specified, then only Service Providers that match the service type name
+ whose implementation class matches the value of this attribute must be
+ registered. To not register a service for this capability use an empty
+ string.</para>
+      </section>
+      <section xreflabel="SERVICELOADER_NAMESPACE"
+               role="field"
+               xml:id="org.osgi.service.serviceloader.ServiceLoaderNamespace.SERVICELOADER_NAMESPACE">
+         <title>public static final String SERVICELOADER_NAMESPACE = "osgi.serviceloader"</title>
+         <para>
+Namespace name for service loader capabilities and requirements.
+ 
+ </para>
+         <para>
+ Also, the capability attribute used to specify the fully qualified name
+ of the service type.</para>
+      </section>
+   </section>
+</section>

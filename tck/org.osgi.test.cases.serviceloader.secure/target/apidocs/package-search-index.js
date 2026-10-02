@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"org.osgi.test.cases.serviceloader.secure.client"},{"l":"org.osgi.test.cases.serviceloader.secure.export"},{"l":"org.osgi.test.cases.serviceloader.secure.impl"},{"l":"org.osgi.test.cases.serviceloader.secure.junit"},{"l":"org.osgi.test.cases.serviceloader.secure.spi"}];updateSearchResults();

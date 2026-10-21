@@ -18,6 +18,8 @@
 
 package org.osgi.test.cases.serviceloader.serviceclient;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Hashtable;
 
 import org.osgi.framework.BundleActivator;
@@ -26,7 +28,6 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.test.cases.serviceloader.export.TestBridge;
 import org.osgi.test.cases.serviceloader.spi.ColorProvider;
 
-import junit.framework.TestCase;
 
 /**
  * @author <a href="mailto:tdiekman@tibco.com">Tim Diekmann</a>
@@ -47,16 +48,14 @@ public class ColorProviderClient implements BundleActivator, TestBridge {
      */
     public void run(String result) throws Exception {
         ServiceReference<ColorProvider> reference = this.context.getServiceReference(ColorProvider.class);
-        TestCase.assertNotNull(reference);
-        TestCase.assertEquals("134.5.1 service missing sp.provider.url property", "META-INF/services/org.osgi.test.cases.serviceloader.spi.ColorProvider",
-                reference.getProperty("spi.provider.url"));
-        TestCase.assertEquals("134.5.1 service missing implementation property", "TIBCO",
-                reference.getProperty("implementation"));
+        assertThat(reference).isNotNull();
+        assertThat(reference.getProperty("spi.provider.url")).as("134.5.1 service missing sp.provider.url property").isEqualTo("META-INF/services/org.osgi.test.cases.serviceloader.spi.ColorProvider");
+        assertThat(reference.getProperty("implementation")).as("134.5.1 service missing implementation property").isEqualTo("TIBCO");
 
         ColorProvider service = this.context.getService(reference);
-        TestCase.assertNotNull(service);
+        assertThat(service).isNotNull();
 
-        TestCase.assertEquals("green", service.getColor());
+        assertThat(service.getColor()).isEqualTo("green");
 
     }
 

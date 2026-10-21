@@ -18,14 +18,21 @@
 
 package org.osgi.test.cases.serviceloader.junit;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.framework.wiring.BundleWire;
-import org.osgi.test.support.OSGiTestCase;
-import org.osgi.test.support.sleep.Sleep;
+import org.osgi.test.common.annotation.InjectBundleContext;
+import org.osgi.test.common.annotation.InjectBundleInstaller;
+import org.osgi.test.common.install.BundleInstaller;
 
 /**
  * TODO Test cases to write:
@@ -42,20 +49,24 @@ import org.osgi.test.support.sleep.Sleep;
  *
  * @since 1.0.0
  */
-public class ServiceLoaderTest extends OSGiTestCase {
+public class ServiceLoaderTest {
+
+	@InjectBundleContext
+	BundleContext		context;
+
+	@InjectBundleInstaller
+	BundleInstaller		installer;
 	private Bundle spiBundle;
 	
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
+	@BeforeEach
+	public void setUp() throws Exception {
 
-		spiBundle = install("spi.jar");
+		spiBundle = installer.installBundle("spi.jar", false);
 		spiBundle.start();
 	}
 	
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	@AfterEach
+	public void tearDown() throws Exception {
 		
 		spiBundle.stop();
 		spiBundle.uninstall();
@@ -66,16 +77,17 @@ public class ServiceLoaderTest extends OSGiTestCase {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testImplNoExtender() throws Exception {
-		Bundle implBundle = install("implnoreq.jar");
-		assertNotNull(implBundle);
+		Bundle implBundle = installer.installBundle("implnoreq.jar", false);
+		assertThat(implBundle).isNotNull();
 		
 		try {
 			implBundle.start();
 			
-			Sleep.sleep(500); // wait 500 ms in case the extender takes a little to extend this bundle
+			Thread.sleep(500); // wait 500 ms in case the extender takes a little to extend this bundle
 		
-			assertNull("bundle should not be extended and have registered services", implBundle.getRegisteredServices());
+			assertThat(implBundle.getRegisteredServices()).as("bundle should not be extended and have registered services").isNull();
 		} finally {
 			implBundle.uninstall();
 		}
@@ -86,22 +98,23 @@ public class ServiceLoaderTest extends OSGiTestCase {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testImplNotExtended() throws Exception {
-		Bundle implBundle = install("implnotextended.jar");
-		assertNotNull(implBundle);
+		Bundle implBundle = installer.installBundle("implnotextended.jar", false);
+		assertThat(implBundle).isNotNull();
 		
 		try {
 			implBundle.start();
 			
-			Sleep.sleep(500); // wait 500 ms in case the extender takes a little to extend this bundle
+			Thread.sleep(500); // wait 500 ms in case the extender takes a little to extend this bundle
 			
 			ServiceReference<?>[] refs = implBundle.getRegisteredServices();
-			assertNotNull(refs);
-			assertEquals((long)-1, refs[0].getProperty("serviceloader.mediator"));
+			assertThat(refs).isNotNull();
+			assertThat(refs[0].getProperty("serviceloader.mediator")).isEqualTo((long)-1);
 			
 			BundleRevision rev = implBundle.adapt(BundleRevision.class);
 			List<BundleWire> wires = rev.getWiring().getRequiredWires("osgi.extender");
-			assertTrue("bundle must not be extended by the mediator as it doesn't have the requirement set", wires.isEmpty());
+			assertThat(wires).as("bundle must not be extended by the mediator as it doesn't have the requirement set").isEmpty();
 		} finally {
 			implBundle.uninstall();
 		}
@@ -112,20 +125,21 @@ public class ServiceLoaderTest extends OSGiTestCase {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testImplNoCapability() throws Exception {
-		Bundle implBundle = install("implnocap.jar");
-		assertNotNull(implBundle);
+		Bundle implBundle = installer.installBundle("implnocap.jar", false);
+		assertThat(implBundle).isNotNull();
 		
 		try {
 			implBundle.start();
 			
-			Sleep.sleep(500); // wait 500 ms in case the extender takes a little to extend this bundle
+			Thread.sleep(500); // wait 500 ms in case the extender takes a little to extend this bundle
 		
 			BundleRevision rev = implBundle.adapt(BundleRevision.class);
 			List<BundleWire> wires = rev.getWiring().getRequiredWires("osgi.extender");
-			assertFalse("bundle must be wired but not extended by the mediator as it doesn't have the capability set", wires.isEmpty());
+			assertThat(wires).as("bundle must be wired but not extended by the mediator as it doesn't have the capability set").isNotEmpty();
 			
-			assertNull("bundle should not be extended and have registered services", implBundle.getRegisteredServices());
+			assertThat(implBundle.getRegisteredServices()).as("bundle should not be extended and have registered services").isNull();
 		} finally {
 			implBundle.uninstall();
 		}
@@ -136,20 +150,21 @@ public class ServiceLoaderTest extends OSGiTestCase {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testImplWildcardCapability() throws Exception {
-		Bundle implBundle = install("implwccap.jar");
-		assertNotNull(implBundle);
+		Bundle implBundle = installer.installBundle("implwccap.jar", false);
+		assertThat(implBundle).isNotNull();
 		
 		try {
 			implBundle.start();
 			
-			Sleep.sleep(500); // wait 500 ms in case the extender takes a little to extend this bundle
+			Thread.sleep(500); // wait 500 ms in case the extender takes a little to extend this bundle
 		
 			BundleRevision rev = implBundle.adapt(BundleRevision.class);
 			List<BundleWire> wires = rev.getWiring().getRequiredWires("osgi.extender");
-			assertFalse("bundle must be wired but not extended by the mediator as its capability uses wildacrd", wires.isEmpty());
+			assertThat(wires).as("bundle must be wired but not extended by the mediator as its capability uses wildacrd").isNotEmpty();
 			
-			assertNull("bundle should not be extended and have registered services since its capability uses wildcards", implBundle.getRegisteredServices());
+			assertThat(implBundle.getRegisteredServices()).as("bundle should not be extended and have registered services since its capability uses wildcards").isNull();
 		} finally {
 			implBundle.uninstall();
 		}
@@ -160,56 +175,57 @@ public class ServiceLoaderTest extends OSGiTestCase {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testAutoRegister() throws Exception {
-		Bundle implBundle = install("implautoregister.jar");
-		assertNotNull(implBundle);
+		Bundle implBundle = installer.installBundle("implautoregister.jar", false);
+		assertThat(implBundle).isNotNull();
 		
 		Bundle mediatorBundle = null;
 		
 		try {
 			implBundle.start();
 			
-			Sleep.sleep(500); // wait 500 ms in case the extender takes a little to extend this bundle
+			Thread.sleep(500); // wait 500 ms in case the extender takes a little to extend this bundle
 			
 			// find the Mediator bundle
 			BundleRevision rev = implBundle.adapt(BundleRevision.class);
 			List<BundleWire> wires = rev.getWiring().getRequiredWires("osgi.extender");
-			assertNotNull(wires);
+			assertThat(wires).isNotNull();
 			BundleWire wire = wires.get(0);
-			assertNotNull(wire);
+			assertThat(wire).isNotNull();
 			mediatorBundle = wire.getProvider().getBundle();
-			assertNotNull(mediatorBundle);
+			assertThat(mediatorBundle).isNotNull();
 			
 			ServiceReference<?>[] refs = implBundle.getRegisteredServices();
-			assertNotNull(refs);
-			assertEquals(2, refs.length);
-			assertEquals("expecting serviceloader.mediator property to contain id of mediator bundle", mediatorBundle.getBundleId(), refs[0].getProperty("serviceloader.mediator"));
-			assertEquals("public property must be registered with the service", "TCK", refs[0].getProperty("provider"));
-			assertEquals("public property must be registered with the service", "TCK", refs[1].getProperty("provider"));
-			assertNull("private properties must not be registered with the service", refs[0].getProperty(".hint"));
-			assertNull("private properties must not be registered with the service", refs[1].getProperty(".hint"));
+			assertThat(refs).isNotNull();
+			assertThat(refs).hasSize(2);
+			assertThat(refs[0].getProperty("serviceloader.mediator")).as("expecting serviceloader.mediator property to contain id of mediator bundle").isEqualTo(mediatorBundle.getBundleId());
+			assertThat(refs[0].getProperty("provider")).as("public property must be registered with the service").isEqualTo("TCK");
+			assertThat(refs[1].getProperty("provider")).as("public property must be registered with the service").isEqualTo("TCK");
+			assertThat(refs[0].getProperty(".hint")).as("private properties must not be registered with the service").isNull();
+			assertThat(refs[1].getProperty(".hint")).as("private properties must not be registered with the service").isNull();
 			
 			implBundle.stop();
 			refs = implBundle.getRegisteredServices();
-			assertNull("provider services should have been unregistered", refs);
+			assertThat(refs).as("provider services should have been unregistered").isNull();
 			
 			// starting again
 			implBundle.start();
 			
-			Sleep.sleep(500); // wait 500 ms in case the extender takes a little to extend this bundle
+			Thread.sleep(500); // wait 500 ms in case the extender takes a little to extend this bundle
 			
 			refs = implBundle.getRegisteredServices();
-			assertNotNull("no services registered", refs);
-			assertEquals(2, refs.length);
-			assertEquals("expecting serviceloader.mediator property to contain id of mediator bundle", mediatorBundle.getBundleId(), refs[0].getProperty("serviceloader.mediator"));
-			assertEquals("public property must be registered with the service", "TCK", refs[0].getProperty("provider"));
-			assertEquals("public property must be registered with the service", "TCK", refs[1].getProperty("provider"));
-			assertNull("private properties must not be registered with the service", refs[0].getProperty(".hint"));
-			assertNull("private properties must not be registered with the service", refs[1].getProperty(".hint"));
+			assertThat(refs).as("no services registered").isNotNull();
+			assertThat(refs).hasSize(2);
+			assertThat(refs[0].getProperty("serviceloader.mediator")).as("expecting serviceloader.mediator property to contain id of mediator bundle").isEqualTo(mediatorBundle.getBundleId());
+			assertThat(refs[0].getProperty("provider")).as("public property must be registered with the service").isEqualTo("TCK");
+			assertThat(refs[1].getProperty("provider")).as("public property must be registered with the service").isEqualTo("TCK");
+			assertThat(refs[0].getProperty(".hint")).as("private properties must not be registered with the service").isNull();
+			assertThat(refs[1].getProperty(".hint")).as("private properties must not be registered with the service").isNull();
 
 			mediatorBundle.stop();
 			refs = mediatorBundle.getRegisteredServices();
-			assertNull("provider services should have been unregistered when the mediator is stopped", refs);
+			assertThat(refs).as("provider services should have been unregistered when the mediator is stopped").isNull();
 		} finally {
 			implBundle.stop();
 			implBundle.uninstall();
@@ -225,36 +241,37 @@ public class ServiceLoaderTest extends OSGiTestCase {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testExplicitRegistration() throws Exception {
-		Bundle implBundle = install("implexplicitregister.jar");
-		assertNotNull(implBundle);
+		Bundle implBundle = installer.installBundle("implexplicitregister.jar", false);
+		assertThat(implBundle).isNotNull();
 		
 		Bundle mediatorBundle = null;
 		
 		try {
 			implBundle.start();
 			
-			Sleep.sleep(500); // wait 500 ms in case the extender takes a little to extend this bundle
+			Thread.sleep(500); // wait 500 ms in case the extender takes a little to extend this bundle
 			
 			// find the Mediator bundle
 			BundleRevision rev = implBundle.adapt(BundleRevision.class);
 			List<BundleWire> wires = rev.getWiring().getRequiredWires("osgi.extender");
-			assertNotNull(wires);
+			assertThat(wires).isNotNull();
 			BundleWire wire = wires.get(0);
-			assertNotNull(wire);
+			assertThat(wire).isNotNull();
 			mediatorBundle = wire.getProvider().getBundle();
-			assertNotNull(mediatorBundle);
+			assertThat(mediatorBundle).isNotNull();
 			
 			ServiceReference<?>[] refs = implBundle.getRegisteredServices();
-			assertNotNull(refs);
-			assertEquals("only one implementation should have been registered", 1, refs.length);
-			assertEquals("expecting serviceloader.mediator property to contain id of mediator bundle", mediatorBundle.getBundleId(), refs[0].getProperty("serviceloader.mediator"));
-			assertEquals("public property must be registered with the service", "TCK", refs[0].getProperty("provider"));
-			assertNull("private properties must not be registered with the service", refs[0].getProperty(".hint"));
+			assertThat(refs).isNotNull();
+			assertThat(refs.length).as("only one implementation should have been registered").isOne();
+			assertThat(refs[0].getProperty("serviceloader.mediator")).as("expecting serviceloader.mediator property to contain id of mediator bundle").isEqualTo(mediatorBundle.getBundleId());
+			assertThat(refs[0].getProperty("provider")).as("public property must be registered with the service").isEqualTo("TCK");
+			assertThat(refs[0].getProperty(".hint")).as("private properties must not be registered with the service").isNull();
 
 			implBundle.stop();
 			refs = implBundle.getRegisteredServices();
-			assertNull("provider services should have been unregistered", refs);
+			assertThat(refs).as("provider services should have been unregistered").isNull();
 			
 		} finally {
 			implBundle.stop();
@@ -267,34 +284,35 @@ public class ServiceLoaderTest extends OSGiTestCase {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testServiceFactory() throws Exception {
-		Bundle implBundle = install("implexplicitregister.jar");
-		assertNotNull(implBundle);
+		Bundle implBundle = installer.installBundle("implexplicitregister.jar", false);
+		assertThat(implBundle).isNotNull();
 		
 		Bundle mediatorBundle = null;
 		
 		try {
 			implBundle.start();
 			
-			Sleep.sleep(500); // wait 500 ms in case the extender takes a little to extend this bundle
+			Thread.sleep(500); // wait 500 ms in case the extender takes a little to extend this bundle
 			
 			// find the Mediator bundle
 			BundleRevision rev = implBundle.adapt(BundleRevision.class);
 			List<BundleWire> wires = rev.getWiring().getRequiredWires("osgi.extender");
-			assertNotNull(wires);
+			assertThat(wires).isNotNull();
 			BundleWire wire = wires.get(0);
-			assertNotNull(wire);
+			assertThat(wire).isNotNull();
 			mediatorBundle = wire.getProvider().getBundle();
-			assertNotNull(mediatorBundle);
+			assertThat(mediatorBundle).isNotNull();
 			
 			ServiceReference<?>[] refs = implBundle.getRegisteredServices();
-			assertNotNull(refs);
-			assertEquals(1, refs.length);
-			assertEquals("expecting serviceloader.mediator property to contain id of mediator bundle", mediatorBundle.getBundleId(), refs[0].getProperty("serviceloader.mediator"));
+			assertThat(refs).isNotNull();
+			assertThat(refs).hasSize(1);
+			assertThat(refs[0].getProperty("serviceloader.mediator")).as("expecting serviceloader.mediator property to contain id of mediator bundle").isEqualTo(mediatorBundle.getBundleId());
 
 			// register 2 client bundles and compare the returned service object to make sure they are different
-			Bundle client1 = install("client1.jar");
-			Bundle client2 = install("client2.jar");
+			Bundle client1 = installer.installBundle("client1.jar", false);
+			Bundle client2 = installer.installBundle("client2.jar", false);
 			
 			try {
 				client1.start();
@@ -303,18 +321,16 @@ public class ServiceLoaderTest extends OSGiTestCase {
 				ServiceReference< ? > ref1 = client1.getBundleContext()
 						.getServiceReference(
 								"org.osgi.test.cases.serviceloader.spi.ColorProvider");
-				assertNotNull(ref1);
+				assertThat(ref1).isNotNull();
 				Object service1 = client1.getBundleContext().getService(ref1);
 
 				ServiceReference< ? > ref2 = client2.getBundleContext()
 						.getServiceReference(
 								"org.osgi.test.cases.serviceloader.spi.ColorProvider");
-				assertNotNull(ref2);
+				assertThat(ref2).isNotNull();
 				Object service2 = client2.getBundleContext().getService(ref2);
 
-				assertNotSame(
-						"provider must be registered as a ServiceFactory and return different objects to different clients",
-						service1, service2);
+				assertThat(service2).as("provider must be registered as a ServiceFactory and return different objects to different clients").isNotSameAs(service1);
 			} finally {
 				client2.uninstall();
 				client1.uninstall();

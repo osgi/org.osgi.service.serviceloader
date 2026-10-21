@@ -17,6 +17,8 @@
  *******************************************************************************/
 package org.osgi.test.cases.serviceloader.client;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.ServiceLoader;
@@ -26,7 +28,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.test.cases.serviceloader.export.TestBridge;
 import org.osgi.test.cases.serviceloader.spi.ColorProvider;
 
-import junit.framework.TestCase;
 
 /**
  * A client using the {@link ServiceLoader} API directly to gain access to multiple service provider types.
@@ -42,14 +43,14 @@ public class LegacyClient implements BundleActivator, TestBridge {
 		System.out.println("client run - begin");
 
 		ServiceLoader<ColorProvider> slColorProvider = ServiceLoader.load(ColorProvider.class);
-		TestCase.assertNotNull(slColorProvider);
-		TestCase.assertTrue("no ColorProvider found", slColorProvider.iterator().hasNext());
+		assertThat(slColorProvider).isNotNull();
+		assertThat(slColorProvider.iterator()).as("no ColorProvider found").hasNext();
 		
 		int i=0;
 		for (Iterator<ColorProvider> it = slColorProvider.iterator(); it.hasNext(); i++) {
 			System.out.println("  color = " + it.next().getColor());
 		}
-		TestCase.assertEquals("expected 2 implementations of service type", 2, i);
+		assertThat(i).as("expected 2 implementations of service type").isEqualTo(2);
 
 		System.out.println("client run - end");
 	}

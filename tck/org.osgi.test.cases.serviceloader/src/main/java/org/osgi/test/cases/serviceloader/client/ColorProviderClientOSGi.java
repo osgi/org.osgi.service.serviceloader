@@ -18,6 +18,8 @@
 
 package org.osgi.test.cases.serviceloader.client;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collection;
 import java.util.Hashtable;
 
@@ -27,7 +29,6 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.test.cases.serviceloader.export.TestBridge;
 import org.osgi.test.cases.serviceloader.spi.ColorProvider;
 
-import junit.framework.TestCase;
 
 /**
  * @author <a href="mailto:tdiekman@tibco.com">Tim Diekmann</a>
@@ -51,16 +52,16 @@ public class ColorProviderClientOSGi implements BundleActivator, TestBridge {
 
 		String filter = "(type=two)";
 		Collection<ServiceReference<ColorProvider>> refs = context.getServiceReferences(ColorProvider.class, filter);
-		TestCase.assertNotNull(refs);
-		TestCase.assertEquals("expected 1 provider", 1, refs.size());
+		assertThat(refs).isNotNull();
+		assertThat(refs).as("expected 1 provider").hasSize(1);
 
 		ServiceReference<ColorProvider> ref = refs.iterator().next();
 		ColorProvider provider = context.getService(ref);
 		
 		try {
-			TestCase.assertNotNull(provider);
+			assertThat(provider).isNotNull();
 
-			TestCase.assertEquals(result, provider.getColor());
+			assertThat(provider.getColor()).isEqualTo(result);
 		} finally {
 			context.ungetService(ref);
 		}

@@ -18,6 +18,8 @@
 
 package org.osgi.test.cases.serviceloader.secure.client;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Hashtable;
 import java.util.ServiceLoader;
 
@@ -26,7 +28,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.test.cases.serviceloader.secure.export.TestBridge;
 import org.osgi.test.cases.serviceloader.secure.spi.ColorProvider;
 
-import junit.framework.TestCase;
 
 /**
  * @author <a href="mailto:tdiekman@tibco.com">Tim Diekmann</a>
@@ -48,18 +49,18 @@ public class ColorProviderClient implements BundleActivator, TestBridge {
 		System.out.println("client run - begin");
 
 		ServiceLoader<ColorProvider> sl = ServiceLoader.load(ColorProvider.class);
-		TestCase.assertNotNull(sl);
+		assertThat(sl).isNotNull();
 		
 		if (result != null) {
-			TestCase.assertTrue("no ColorProvider found", sl.iterator().hasNext());
+			assertThat(sl.iterator()).as("no ColorProvider found").hasNext();
 
 			ColorProvider provider = sl.iterator().next();
-			TestCase.assertNotNull(provider);
+			assertThat(provider).isNotNull();
 
-			TestCase.assertEquals(result, provider.getColor());
+			assertThat(provider.getColor()).isEqualTo(result);
 		} else {
 			// expecting no service provider to be found
-			TestCase.assertFalse("expected no provider to be found", sl.iterator().hasNext());
+			assertThat(sl.iterator()).as("expected no provider to be found").isExhausted();
 		}
 		
 		System.out.println("client run - end");

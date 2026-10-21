@@ -18,6 +18,8 @@
 
 package org.osgi.test.cases.serviceloader.client;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Hashtable;
 import java.util.ServiceLoader;
 
@@ -26,7 +28,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.test.cases.serviceloader.export.TestBridge;
 import org.osgi.test.cases.serviceloader.spi.ColorProvider;
 
-import junit.framework.TestCase;
 
 /**
  * @author <a href="mailto:tdiekman@tibco.com">Tim Diekmann</a>
@@ -47,8 +48,8 @@ public class ColorProviderClient2 implements BundleActivator, TestBridge {
 		System.out.println("client run - begin");
 		
 		ServiceLoader<ColorProvider> sl = ServiceLoader.load(ColorProvider.class);
-		TestCase.assertNotNull(sl);
-		TestCase.assertTrue("no ColorProvider found", sl.iterator().hasNext());
+		assertThat(sl).isNotNull();
+		assertThat(sl.iterator()).as("no ColorProvider found").hasNext();
 
 		int count = 0;
 		for (ColorProvider cp : sl) {
@@ -57,7 +58,7 @@ public class ColorProviderClient2 implements BundleActivator, TestBridge {
 			System.out.println(color);
 		}
 		
-		TestCase.assertEquals("expected exactly " + result + " provider(s)", result, ""+count);
+		assertThat(""+count).as("expected exactly " + result + " provider(s)").isEqualTo(result);
 		
 		System.out.println("client run - end");
 	}

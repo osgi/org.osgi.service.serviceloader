@@ -19,22 +19,28 @@
 package org.osgi.test.cases.serviceloader.junit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.framework.wiring.BundleWire;
 import org.osgi.test.cases.serviceloader.export.TestBridge;
-import org.osgi.test.support.OSGiTestCase;
+import org.osgi.test.common.annotation.InjectBundleContext;
+import org.osgi.test.common.annotation.InjectBundleInstaller;
+import org.osgi.test.common.install.BundleInstaller;
 
-import junit.framework.AssertionFailedError;
 
 /**
  * TODO Test cases to write:
@@ -51,20 +57,24 @@ import junit.framework.AssertionFailedError;
  *
  * @since 1.0.0
  */
-public class ServiceLoaderServiceClientTest extends OSGiTestCase {
+public class ServiceLoaderServiceClientTest {
+
+	@InjectBundleContext
+	BundleContext		context;
+
+	@InjectBundleInstaller
+	BundleInstaller		installer;
 	private Bundle spiBundle;
 	
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
+	@BeforeEach
+	public void setUp() throws Exception {
 
-		spiBundle = install("spi.jar");
+		spiBundle = installer.installBundle("spi.jar", false);
 		spiBundle.start();
 	}
 	
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	@AfterEach
+	public void tearDown() throws Exception {
 		
 		spiBundle.stop();
 		spiBundle.uninstall();
@@ -76,35 +86,36 @@ public class ServiceLoaderServiceClientTest extends OSGiTestCase {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testNotExtended() throws Exception {
-        Bundle implBundle = install("implexplicitregister.jar");
+        Bundle implBundle = installer.installBundle("implexplicitregister.jar", false);
         implBundle.start();
 
         try {
-        	Bundle clientBundle = install("clientnotextended.jar");
-        	assertNotNull(clientBundle);
+        	Bundle clientBundle = installer.installBundle("clientnotextended.jar", false);
+        	assertThat(clientBundle).isNotNull();
 
         	try {
         		clientBundle.start();
         		
         		BundleRevision rev = clientBundle.adapt(BundleRevision.class);
         		List<BundleWire> wires = rev.getWiring().getRequiredWires("osgi.extender");
-        		assertNotNull(wires);
-        		assertTrue(wires.isEmpty());
+        		assertThat(wires).isNotNull();
+        		assertThat(wires).isEmpty();
 
 
-        		Collection<ServiceReference<TestBridge>> refs = getContext().getServiceReferences(TestBridge.class, "(test=client)");
-        		assertNotNull(refs);
-        		assertEquals(1, refs.size());
+        		Collection<ServiceReference<TestBridge>> refs = context.getServiceReferences(TestBridge.class, "(test=client)");
+        		assertThat(refs).isNotNull();
+        		assertThat(refs).hasSize(1);
 
-        		TestBridge service = getContext().getService(refs.iterator().next());
-        		assertNotNull("client bundle did not register its service", service);
+        		TestBridge service = context.getService(refs.iterator().next());
+        		assertThat(service).as("client bundle did not register its service").isNotNull();
 
         		try {
         			service.run("green");
 
         			fail("Expecting the client not to find a provider");
-        		} catch (AssertionFailedError ex) {
+        		} catch (AssertionError ex) {
         		}
         	} finally {
         		clientBundle.stop();
@@ -121,28 +132,29 @@ public class ServiceLoaderServiceClientTest extends OSGiTestCase {
      *  
      * @throws Exception
      */
+    @Test
     public void testServiceClient() throws Exception {
-        Bundle implBundle = install("implfirstprovider.jar");
+        Bundle implBundle = installer.installBundle("implfirstprovider.jar", false);
         implBundle.start();
 
         try {
-        	final Bundle client = install("client.jar");
-        	assertNotNull(client);
+        	final Bundle client = installer.installBundle("client.jar", false);
+        	assertThat(client).isNotNull();
         	
         	try {
         		client.start();
 
         		BundleRevision rev = client.adapt(BundleRevision.class);
         		List<BundleWire> wires = rev.getWiring().getRequiredWires("osgi.extender");
-        		assertNotNull(wires);
-        		assertFalse(wires.isEmpty());
+        		assertThat(wires).isNotNull();
+        		assertThat(wires.isEmpty()).isFalse();
         		
-        		Collection<ServiceReference<TestBridge>> refs = getContext().getServiceReferences(TestBridge.class, "(test=client)");
-        		assertNotNull(refs);
-        		assertEquals(1, refs.size());
+        		Collection<ServiceReference<TestBridge>> refs = context.getServiceReferences(TestBridge.class, "(test=client)");
+        		assertThat(refs).isNotNull();
+        		assertThat(refs.size()).isEqualTo(1);
 
-        		TestBridge service = getContext().getService(refs.iterator().next());
-        		assertNotNull("client bundle did not register its service", service);
+        		TestBridge service = context.getService(refs.iterator().next());
+        		assertThat(service).as("client bundle did not register its service").isNotNull();
 
         		service.run("green");
         		
@@ -158,7 +170,7 @@ public class ServiceLoaderServiceClientTest extends OSGiTestCase {
 						}
 					}
 				};
-        		getContext().addFrameworkListener(listener);
+        		context.addFrameworkListener(listener);
         		
         		try {
         			implBundle.stop();
@@ -169,7 +181,7 @@ public class ServiceLoaderServiceClientTest extends OSGiTestCase {
         				System.out.println("133.3.4: client bundle was not refreshed after provider bundle was stopped");
         			}
         		} finally {
-        			getContext().removeFrameworkListener(listener);
+        			context.removeFrameworkListener(listener);
         		}
         	} finally {
         		client.stop();
@@ -193,38 +205,39 @@ public class ServiceLoaderServiceClientTest extends OSGiTestCase {
      *  
      * @throws Exception
      */
+    @Test
     public void testServiceClientWithFilter() throws Exception {
-    	Bundle implBundle = install("implfirstprovider.jar");
+    	Bundle implBundle = installer.installBundle("implfirstprovider.jar", false);
     	implBundle.start();
     	try {
-    		Bundle implBundle2 = install("implsecondprovider.jar");
+    		Bundle implBundle2 = installer.installBundle("implsecondprovider.jar", false);
     		implBundle2.start();
 
     		try {
-    			Bundle client = install("clientfilter.jar");
-    			assertNotNull(client);
+    			Bundle client = installer.installBundle("clientfilter.jar", false);
+    			assertThat(client).isNotNull();
 
     			try {
     				client.start();
 
     				BundleRevision rev = client.adapt(BundleRevision.class);
     				List<BundleWire> wires = rev.getWiring().getRequiredWires("osgi.extender");
-    				assertNotNull(wires);
-    				assertEquals("expecting exactly one mediator wired", 1, wires.size());
+    				assertThat(wires).isNotNull();
+    				assertThat(wires).as("expecting exactly one mediator wired").hasSize(1);
 
     				wires = rev.getWiring().getRequiredWires("osgi.serviceloader");
-    				assertNotNull(wires);
+    				assertThat(wires).isNotNull();
 
 					assertThat(wires).as(
 							"There should be 2 wires as there are 2 providers, but 1 wire is also allowed since cardinality:=multiple is not guaranteed to provide all wires")
 							.hasSizeBetween(1, 2);
 
-    				Collection<ServiceReference<TestBridge>> refs = getContext().getServiceReferences(TestBridge.class, "(test=client)");
-    				assertNotNull(refs);
-    				assertEquals(1, refs.size());
+    				Collection<ServiceReference<TestBridge>> refs = context.getServiceReferences(TestBridge.class, "(test=client)");
+    				assertThat(refs).isNotNull();
+    				assertThat(refs).hasSize(1);
 
-    				TestBridge service = getContext().getService(refs.iterator().next());
-    				assertNotNull("client bundle did not register its service", service);
+    				TestBridge service = context.getService(refs.iterator().next());
+    				assertThat(service).as("client bundle did not register its service").isNotNull();
 
     				service.run("2");
     			} finally {
@@ -247,35 +260,36 @@ public class ServiceLoaderServiceClientTest extends OSGiTestCase {
      *  
      * @throws Exception
      */
+    @Test
     public void testServiceClientWithFilterOne() throws Exception {
-    	Bundle implBundle = install("implfirstprovider.jar");
+    	Bundle implBundle = installer.installBundle("implfirstprovider.jar", false);
     	implBundle.start();
     	try {
-    		Bundle implBundle2 = install("implsecondprovider.jar");
+    		Bundle implBundle2 = installer.installBundle("implsecondprovider.jar", false);
     		implBundle2.start();
 
     		try {
-    			Bundle client = install("clientfilterone.jar");
-    			assertNotNull(client);
+    			Bundle client = installer.installBundle("clientfilterone.jar", false);
+    			assertThat(client).isNotNull();
 
     			try {
     				client.start();
 
     				BundleRevision rev = client.adapt(BundleRevision.class);
     				List<BundleWire> wires = rev.getWiring().getRequiredWires("osgi.extender");
-    				assertNotNull(wires);
-    				assertEquals("expecting exactly one mediator wired", 1, wires.size());
+    				assertThat(wires).isNotNull();
+    				assertThat(wires).as("expecting exactly one mediator wired").hasSize(1);
     				
     				wires = rev.getWiring().getRequiredWires("osgi.serviceloader");
-    				assertNotNull(wires);
-    				assertEquals("expecting 1 provider to be wired", 1, wires.size());
+    				assertThat(wires).isNotNull();
+    				assertThat(wires).as("expecting 1 provider to be wired").hasSize(1);
 
-    				Collection<ServiceReference<TestBridge>> refs = getContext().getServiceReferences(TestBridge.class, "(test=client)");
-    				assertNotNull(refs);
-    				assertEquals(1, refs.size());
+    				Collection<ServiceReference<TestBridge>> refs = context.getServiceReferences(TestBridge.class, "(test=client)");
+    				assertThat(refs).isNotNull();
+    				assertThat(refs).hasSize(1);
 
-    				TestBridge service = getContext().getService(refs.iterator().next());
-    				assertNotNull("client bundle did not register its service", service);
+    				TestBridge service = context.getService(refs.iterator().next());
+    				assertThat(service).as("client bundle did not register its service").isNotNull();
 
     				service.run("red");
     			} finally {
@@ -298,31 +312,32 @@ public class ServiceLoaderServiceClientTest extends OSGiTestCase {
      *  
      * @throws Exception
      */
+    @Test
     public void testServiceClientOSGi() throws Exception {
-    	Bundle implBundle = install("implfirstprovider.jar");
+    	Bundle implBundle = installer.installBundle("implfirstprovider.jar", false);
     	implBundle.start();
     	try {
-    		Bundle implBundle2 = install("implsecondprovider.jar");
+    		Bundle implBundle2 = installer.installBundle("implsecondprovider.jar", false);
     		implBundle2.start();
 
     		try {
-    			Bundle client = install("clientosgi.jar");
-    			assertNotNull(client);
+    			Bundle client = installer.installBundle("clientosgi.jar", false);
+    			assertThat(client).isNotNull();
 
     			try {
     				client.start();
 
     				BundleRevision rev = client.adapt(BundleRevision.class);
     				List<BundleWire> wires = rev.getWiring().getRequiredWires("osgi.extender");
-    				assertNotNull(wires);
-    				assertEquals("expecting exactly one mediator wired", 1, wires.size());
+    				assertThat(wires).isNotNull();
+    				assertThat(wires).as("expecting exactly one mediator wired").hasSize(1);
     				
-    				Collection<ServiceReference<TestBridge>> refs = getContext().getServiceReferences(TestBridge.class, "(test=client)");
-    				assertNotNull(refs);
-    				assertEquals(1, refs.size());
+    				Collection<ServiceReference<TestBridge>> refs = context.getServiceReferences(TestBridge.class, "(test=client)");
+    				assertThat(refs).isNotNull();
+    				assertThat(refs).hasSize(1);
 
-    				TestBridge service = getContext().getService(refs.iterator().next());
-    				assertNotNull("client bundle did not register its service", service);
+    				TestBridge service = context.getService(refs.iterator().next());
+    				assertThat(service).as("client bundle did not register its service").isNotNull();
 
     				service.run("red");
     			} finally {
@@ -346,31 +361,32 @@ public class ServiceLoaderServiceClientTest extends OSGiTestCase {
      *  
      * @throws Exception
      */
+    @Test
     public void testServiceClientLifecycle() throws Exception {
-    	Bundle implBundle = install("implfirstprovider.jar");
+    	Bundle implBundle = installer.installBundle("implfirstprovider.jar", false);
     	implBundle.start();
     	try {
-    		Bundle client = install("clientlifecycle.jar");
-    		assertNotNull(client);
+    		Bundle client = installer.installBundle("clientlifecycle.jar", false);
+    		assertThat(client).isNotNull();
 
     		try {
     			client.start();
 
     			BundleRevision rev = client.adapt(BundleRevision.class);
     			List<BundleWire> wires = rev.getWiring().getRequiredWires("osgi.extender");
-    			assertNotNull(wires);
-    			assertEquals("expecting exactly one mediator wired", 1, wires.size());
+    			assertThat(wires).isNotNull();
+    			assertThat(wires).as("expecting exactly one mediator wired").hasSize(1);
 
     			wires = rev.getWiring().getRequiredWires("osgi.serviceloader");
-    			assertNotNull(wires);
-    			assertEquals("expecting 1 provider to be wired", 1, wires.size());
+    			assertThat(wires).isNotNull();
+    			assertThat(wires).as("expecting 1 provider to be wired").hasSize(1);
 
-    			Collection<ServiceReference<TestBridge>> refs = getContext().getServiceReferences(TestBridge.class, "(test=client)");
-    			assertNotNull(refs);
-    			assertEquals(1, refs.size());
+    			Collection<ServiceReference<TestBridge>> refs = context.getServiceReferences(TestBridge.class, "(test=client)");
+    			assertThat(refs).isNotNull();
+    			assertThat(refs).hasSize(1);
 
-    			TestBridge service = getContext().getService(refs.iterator().next());
-    			assertNotNull("client bundle did not register its service", service);
+    			TestBridge service = context.getService(refs.iterator().next());
+    			assertThat(service).as("client bundle did not register its service").isNotNull();
 
     			// stop the first provider bundle
     			implBundle.stop();
@@ -393,32 +409,33 @@ public class ServiceLoaderServiceClientTest extends OSGiTestCase {
      *  gains access to all services of that same service type. That is, the implementation cannot ensure the visibility to a single implementation of a given service type.
      * @throws Exception
      */
+    @Test
     public void testAccessToAllServices() throws Exception {
-    	Bundle implBundle = install("implmultiprovider.jar");
+    	Bundle implBundle = installer.installBundle("implmultiprovider.jar", false);
     	implBundle.start();
     	
     	try {
-    		Bundle client = install("legacyclient.jar");
-    		assertNotNull(client);
+    		Bundle client = installer.installBundle("legacyclient.jar", false);
+    		assertThat(client).isNotNull();
 
     		try {
     			client.start();
 
     			BundleRevision rev = client.adapt(BundleRevision.class);
     			List<BundleWire> wires = rev.getWiring().getRequiredWires("osgi.extender");
-    			assertNotNull(wires);
-    			assertEquals("expecting exactly one mediator wired", 1, wires.size());
+    			assertThat(wires).isNotNull();
+    			assertThat(wires).as("expecting exactly one mediator wired").hasSize(1);
 
     			wires = rev.getWiring().getRequiredWires("osgi.serviceloader");
-    			assertNotNull(wires);
-    			assertEquals("expecting 1 provider to be wired", 1, wires.size());
+    			assertThat(wires).isNotNull();
+    			assertThat(wires).as("expecting 1 provider to be wired").hasSize(1);
 
-    			Collection<ServiceReference<TestBridge>> refs = getContext().getServiceReferences(TestBridge.class, "(test=client)");
-    			assertNotNull(refs);
-    			assertEquals(1, refs.size());
+    			Collection<ServiceReference<TestBridge>> refs = context.getServiceReferences(TestBridge.class, "(test=client)");
+    			assertThat(refs).isNotNull();
+    			assertThat(refs).hasSize(1);
 
-    			TestBridge service = getContext().getService(refs.iterator().next());
-    			assertNotNull("client bundle did not register its service", service);
+    			TestBridge service = context.getService(refs.iterator().next());
+    			assertThat(service).as("client bundle did not register its service").isNotNull();
 
     			service.run(null);
     		} finally {

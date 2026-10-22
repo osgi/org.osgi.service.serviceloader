@@ -14,7 +14,7 @@
 
 	<properties>
 		<asm-all.version>5.0.4</asm-all.version>
-		<assertj.version>3.23.1</assertj.version>
+		<assertj.version>3.27.7</assertj.version>
 		<byte-buddy.version>1.12.10</byte-buddy.version>
 		<junit-jupiter.version>5.12.2</junit-jupiter.version>
 		<junit-platform.version>1.12.2</junit-platform.version>

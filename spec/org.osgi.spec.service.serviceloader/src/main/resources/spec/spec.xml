@@ -742,6 +742,22 @@ Import-Package:         com.example; version=3.45</programlisting>
       <para>The OSGi service for each selected Service Provider must be
       registered under the advertised Service Type of the Service Provider,
       which must match the Service Type specified in the capability.</para>
+
+      <para>The Mediator must register the selected Service Providers of a
+      managed bundle as soon as that bundle enters the
+      <code>STARTING</code> state. This includes managed bundles that are
+      started using a <code>lazy</code> activation policy and are therefore
+      awaiting activation: such a bundle is already in the
+      <code>STARTING</code> state, even though its Bundle Activator, if any,
+      has not yet been called and may never be called, see
+      <emphasis>Lazy Activation Policy</emphasis> in <xref
+      linkend="intro.core.release" xrefstyle="template:%t"/>. The Mediator
+      must not wait for the lazy activation trigger, that is the first class
+      load from the bundle, before registering its Service Providers, since
+      Service Providers are typically not referenced by regular class loading
+      and the trigger may therefore never occur. This mirrors the requirement
+      on Declarative Services, see <emphasis>Starting and Stopping
+      SCR</emphasis> in the Declarative Services specification.</para>
     </section>
 
     <section>
